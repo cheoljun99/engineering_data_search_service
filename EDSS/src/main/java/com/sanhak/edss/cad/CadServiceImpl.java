@@ -59,7 +59,7 @@ public class CadServiceImpl implements CadService {
 
             System.out.println("cadServiceimpl222");
             for (Map.Entry<String, String[]> entry: fileInfo.entrySet()) {
-                String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 Cad cad = new Cad(author, folder, entry.getValue()[0], entry.getValue()[1], entry.getKey(), entry.getValue()[2], date);
 
                 //cadRepository.save(cad);
