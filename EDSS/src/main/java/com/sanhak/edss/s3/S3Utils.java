@@ -12,9 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.Base64;
 
 @Transactional(readOnly = true)
 @PropertySource(value = "application.properties")
@@ -23,6 +28,13 @@ import java.text.DecimalFormat;
 public class S3Utils {
     private final TransferManager transferManager;
     private final AmazonS3Client amazonS3Client;
+
+    private final String key = "computerandinformationengineerin";
+    private String iv = "kwangwoonunivers";
+    public static String algo = "AES/CBC/PKCS5Padding";
+
+
+
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
@@ -51,8 +63,14 @@ public class S3Utils {
     public String putS3(String filePath, String fileName, ByteArrayOutputStream bos)throws IOException{
 
         byte[] data;
+        String encryptStr="";
         if(bos == null){
-            return "https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg";
+            try {
+                encryptStr = encryptAES256("https://dwg-upload.s3.ap-northeast-2.amazonaws.com/image/images.jpeg");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return encryptStr;
         }
         else{
             data = bos.toByteArray();
@@ -68,6 +86,20 @@ public class S3Utils {
         amazonS3Client.putObject(bucket,filePath+S3_fileName,bin, metadata);
         String PathUrl = amazonS3Client.getUrl(bucket,filePath).toString();
         bin.close();
-        return PathUrl+S3_fileName;
+        try {
+            encryptStr = encryptAES256(PathUrl + S3_fileName);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return encryptStr;
+    }
+    public String encryptAES256(String fileName) throws  Exception{
+        Cipher cipher = Cipher.getInstance(algo);
+        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(),"AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv.getBytes());
+        cipher.init(Cipher.ENCRYPT_MODE,keySpec,ivParameterSpec);
+
+        byte[] encrypted = cipher.doFinal(fileName.getBytes("UTF-8"));
+        return Base64.getEncoder().encodeToString(encrypted);
     }
 }
