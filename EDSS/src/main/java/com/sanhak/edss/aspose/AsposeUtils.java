@@ -56,7 +56,7 @@ public class AsposeUtils {
                         System.out.println(S3url);
                         filePath = filePath.substring(filePath.indexOf(dir) + dir.length(), filePath.indexOf(fileName) - 1);
                         System.out.println(filePath);
-                        fileInfo.put(fileName, new String[]{filePath, fileIndex, S3url});
+                        fileInfo.put(fileIndex, new String[]{filePath, fileName, S3url});
                     }
                     return FileVisitResult.CONTINUE;
                 }
