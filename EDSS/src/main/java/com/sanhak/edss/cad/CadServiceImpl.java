@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -57,7 +59,9 @@ public class CadServiceImpl implements CadService {
 
             System.out.println("cadServiceimpl222");
             for (Map.Entry<String, String[]> entry: fileInfo.entrySet()) {
-                Cad cad = new Cad(author, folder, entry.getValue()[0], entry.getValue()[1], entry.getKey(), entry.getValue()[2]);
+                String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                Cad cad = new Cad(author, folder, entry.getValue()[0], entry.getValue()[1], entry.getKey(), entry.getValue()[2], date);
+
                 //cadRepository.save(cad);
                 mongoTemplate.insert(cad, "cad");
             }

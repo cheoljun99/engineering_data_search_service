@@ -18,17 +18,18 @@ public class Cad {
     private String title;
     private String index;
     private String s3Url;
-    private LocalDateTime createdAt;
+
+    private String createdAt;
 
 
-    public Cad(String author, String mainCategory, String subCategory, String title, String index, String s3Url) {
+    public Cad(String author, String mainCategory, String subCategory, String title, String index, String s3Url, String createdAt) {
         this.author = author;
         this.mainCategory = mainCategory;
         this.subCategory = subCategory;
         this.title = title;
         this.index = index;
         this.s3Url = s3Url;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = createdAt;
     }
 
     @Override
