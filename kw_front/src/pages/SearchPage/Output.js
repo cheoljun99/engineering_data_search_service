@@ -1,8 +1,31 @@
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 import cryptoJs from "crypto-js";
-function Output({ output, setOutput }) {
+
+function Output({ output, setOutput, highlightIndex }) {
   const REGION = "ap-northeast-2";
   const S3_BUCKET = "dwg-upload";
+
+  //////////////////////////////////////////////////////////
+  const highlightedText = (text, query) => {
+    if (query !== "" && text.includes(query)) {
+      const parts = text.split(new RegExp(`(${query})`, "gi"));
+
+      return (
+        <>
+          {parts.map((part, index) =>
+            part.toLowerCase() === query.toLowerCase() ? (
+              <mark key={index}>{part}</mark>
+            ) : (
+              part
+            )
+          )}
+        </>
+      );
+    }
+
+    return text;
+  };
+  //////////////////////////////////////////////////////////
 
   const listitem = (filelist) => {
     const result = [];
@@ -22,7 +45,13 @@ function Output({ output, setOutput }) {
       const imgURL = decipher.toString(cryptoJs.enc.Utf8);
       ///////////////////////////////////////////////////////////////
 
-      const date = `${filelist[i].createdAt[0]}.${filelist[i].createdAt[1]}.${filelist[i].createdAt[2]} ${filelist[i].createdAt[3]}:${filelist[i].createdAt[4]}:${filelist[i].createdAt[5]}`;
+      let indexlist = filelist[i].index.split("|");
+      let indextmplist = [];
+      for (let j = 0; j < indexlist.length; j++) {
+        if (indexlist[j].includes(highlightIndex)) {
+          indextmplist.push(indexlist[j]);
+        }
+      }
 
       result.push(
         <a
@@ -37,19 +66,25 @@ function Output({ output, setOutput }) {
               /*filelist[i].fileimg*/
             }
           />
+          <div className=" w-full  h-[10%] border-b text-[14px] break-all truncate hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black ">
+            인덱스: {highlightedText(indextmplist.join(","), highlightIndex)}
+          </div>
           <div className=" w-full  h-[10%] border-b text-[14px] break-all truncate hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
-            제목: {filelist[i].title}
+            제목: {highlightedText(filelist[i].title, highlightIndex)}
           </div>
           <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
             경로:{" "}
-            {`${filelist[i].mainCategory}${filelist[i].subCategory}/${filelist[i].title}`}
+            {highlightedText(
+              `${filelist[i].mainCategory}${filelist[i].subCategory}/${filelist[i].title}`,
+              highlightIndex
+            )}
           </div>
 
           <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
             작성자: {filelist[i].author}
           </div>
           <div className=" w-full h-[10%]  text-[14px] break-all truncate  hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
-            작성날짜: {date}
+            작성날짜: {filelist[i].createdAt}
           </div>
         </a>
       );
@@ -95,9 +130,12 @@ function Output({ output, setOutput }) {
             className="ml-3 hover:border-[#e4e1f1] hover:border rounded-[6px] focus:outline-none focus:ring-4 focus:ring-[#f1f6fe]"
             onClick={() => {
               let TmpOutput = [...output];
-              TmpOutput.sort((a, b) =>
-                a.createdAt.toLowerCase() < b.createdAt.toLowerCase() ? -1 : 1
-              );
+              TmpOutput.sort((a, b) => {
+                return (
+                  new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+                );
+              });
               console.log(TmpOutput);
               setOutput(TmpOutput);
             }}
@@ -108,9 +146,12 @@ function Output({ output, setOutput }) {
             className="ml-3 hover:border-[#e4e1f1] hover:border rounded-[6px] focus:outline-none focus:ring-4 focus:ring-[#f1f6fe]"
             onClick={() => {
               let TmpOutput = [...output];
-              TmpOutput.sort((a, b) =>
-                a.createdAt.toLowerCase() > b.createdAt.toLowerCase() ? -1 : 1
-              );
+              TmpOutput.sort((a, b) => {
+                return (
+                  new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+                );
+              }).reverse();
               console.log(TmpOutput);
               setOutput(TmpOutput);
             }}

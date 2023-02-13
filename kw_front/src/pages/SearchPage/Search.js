@@ -1,6 +1,12 @@
 import axios from "axios";
 
-function Search({ searchIndex, setSearchIndex, setOutput, output }) {
+function Search({
+  searchIndex,
+  setSearchIndex,
+  setOutput,
+  output,
+  setHighlightIndex,
+}) {
   const onchangesearchindex = (e) => {
     setSearchIndex(e.target.value);
   };
@@ -8,7 +14,10 @@ function Search({ searchIndex, setSearchIndex, setOutput, output }) {
     //로컬서버에 검색 인덱스 전달하는 함수
     // form 안에 input을 전송할 때 페이지 리로드 되는 걸 막아줌
     console.log("searchindex", searchIndex);
+
     e.preventDefault();
+
+    setHighlightIndex(searchIndex);
 
     axios
       .get("http://localhost:8080/cad/data", {

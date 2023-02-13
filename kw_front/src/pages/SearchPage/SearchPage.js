@@ -4,6 +4,9 @@ import Output from "./Output";
 import { useState } from "react";
 function SearchPage() {
   const [searchIndex, setSearchIndex] = useState("");
+  const [highlightIndex, setHighlightIndex] = useState("");
+
+  console.log(highlightIndex);
 
   const [output, setOutput] = useState([]);
 
@@ -15,8 +18,13 @@ function SearchPage() {
         setSearchIndex={setSearchIndex}
         setOutput={setOutput}
         output={output}
+        setHighlightIndex={setHighlightIndex}
       />
-      <Output output={output} setOutput={setOutput} />
+      <Output
+        output={output}
+        setOutput={setOutput}
+        highlightIndex={highlightIndex}
+      />
     </div>
   );
 }
