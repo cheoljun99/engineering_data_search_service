@@ -1,8 +1,45 @@
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 import cryptoJs from "crypto-js";
-function Output({ output, setOutput }) {
+function Output({
+  output,
+  setOutput,
+  highlightIndex,
+  detailModal,
+  setDetailModal,
+  setImage,
+  setIndex,
+  setTitle,
+  setPath,
+  setAuthor,
+  setDate,
+  setFileURL,
+}) {
   const REGION = "ap-northeast-2";
   const S3_BUCKET = "dwg-upload";
+
+  //////////////////////////////////////////////////////////
+  const highlightedText = (text, query) => {
+    if (query !== "" && text.includes(query)) {
+      const parts = text.split(new RegExp(`(${query})`, "gi"));
+
+      return (
+        <>
+          {parts.map((part, index) =>
+            part.toLowerCase() === query.toLowerCase() ? (
+              <span class="font-bold text-violet-700 " key={index}>
+                {part}
+              </span>
+            ) : (
+              part
+            )
+          )}
+        </>
+      );
+    }
+
+    return text;
+  };
+  //////////////////////////////////////////////////////////
 
   const listitem = (filelist) => {
     const result = [];
@@ -22,11 +59,27 @@ function Output({ output, setOutput }) {
       const imgURL = decipher.toString(cryptoJs.enc.Utf8);
       ///////////////////////////////////////////////////////////////
 
+      let indexlist = filelist[i].index.split("|");
+
+
       result.push(
-        <a
-          href={fileURL}
-          className=" flex flex-col  w-[22.5%] items-center h-[300px] ml-[2%] mt-[2%]  flex-nowrap  focus:outline-none focus:ring-8 focus:ring-[#f1f6fe] rounded-[6px] border "
-          download
+        <div
+          className=" flex flex-col  w-[22.5%] items-center h-[300px] ml-[2%] mt-[2%]  flex-nowrap  focus:outline-none focus:ring-8 focus:ring-[#f1f6fe] rounded-[6px] border cursor-pointer"
+          onClick={() => {
+            setDetailModal(true);
+            setImage(imgURL);
+            setIndex(highlightedText(indexlist.join(","), highlightIndex));
+            setTitle(highlightedText(filelist[i].title, highlightIndex));
+            setPath(
+              highlightedText(
+                `${filelist[i].mainCategory}${filelist[i].subCategory}/${filelist[i].title}`,
+                highlightIndex
+              )
+            );
+            setAuthor(filelist[i].author);
+            setDate(filelist[i].createdAt);
+            setFileURL(fileURL);
+          }}
         >
           <img
             className="h-[60%] border-b rounded-t-[6px]"
@@ -35,21 +88,27 @@ function Output({ output, setOutput }) {
               /*filelist[i].fileimg*/
             }
           />
-          <div className=" w-full  h-[10%] border-b text-[14px] break-all truncate hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
-            제목: {filelist[i].title}
+          <div className=" w-full  h-[10%] border-b text-[14px] break-all truncate ">
+            제목: {highlightedText(filelist[i].title, highlightIndex)}
           </div>
-          <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
+          <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  ">
             경로:{" "}
-            {`${filelist[i].mainCategory}${filelist[i].subCategory}/${filelist[i].title}`}
+            {highlightedText(
+              `${filelist[i].mainCategory}${filelist[i].subCategory}/${filelist[i].title}`,
+              highlightIndex
+            )}
           </div>
 
-          <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
+          <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  ">
             작성자: {filelist[i].author}
           </div>
-          <div className=" w-full h-[10%]  text-[14px] break-all truncate  hover:z-10 hover:overflow-y-auto hover:whitespace-normal hover:h-[40%] hover:border hover:border-black">
+          <div className=" w-full h-[10%] border-b text-[14px] break-all truncate  ">
             작성날짜: {filelist[i].createdAt}
           </div>
-        </a>
+          <div className=" w-full  h-[10%]  text-[14px] break-all truncate  ">
+            인덱스: {highlightedText(indexlist.join(","), highlightIndex)}
+          </div>
+        </div>
       );
     }
     return result;
