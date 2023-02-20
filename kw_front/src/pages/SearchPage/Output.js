@@ -61,6 +61,7 @@ function Output({
 
       let indexlist = filelist[i].index.split("|");
 
+
       result.push(
         <div
           className=" flex flex-col  w-[22.5%] items-center h-[300px] ml-[2%] mt-[2%]  flex-nowrap  focus:outline-none focus:ring-8 focus:ring-[#f1f6fe] rounded-[6px] border cursor-pointer"
